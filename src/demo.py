@@ -5,6 +5,7 @@ from betting_service import BettingService, FixedAmountStrategy, PercentageStrat
 from game_session_service import GameSessionService
 from win_loss_calculator import WinLossCalculator
 from input_validator import InputValidator
+from user_interface import UserInterface
 
 
 def section(title):
@@ -173,6 +174,12 @@ def main():
             print(f"  '{raw.strip()}' -> {val}")
         except Exception as e:
             print(f"  '{raw.strip()}' -> Error: {e}")
+
+
+    section("Use Case 7: User Interaction")
+
+    ui = UserInterface()
+    ui.run_demo()
 
 
 if __name__ == "__main__":
