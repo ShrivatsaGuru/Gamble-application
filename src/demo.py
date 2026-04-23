@@ -3,6 +3,7 @@ from gambler_profile_service import GamblerProfileService
 from stake_management_service import StakeManagementService
 from betting_service import BettingService, FixedAmountStrategy, PercentageStrategy, MartingaleStrategy
 from game_session_service import GameSessionService
+from win_loss_calculator import WinLossCalculator
 
 
 def section(title):
@@ -113,6 +114,27 @@ def main():
 
     print("\nSession summary")
     session_svc.get_session_summary(sid)
+
+
+    section("Use Case 5: Win/Loss Calculation")
+
+    initial_stake = 500.0
+    stake = initial_stake
+    calc = WinLossCalculator(win_probability=0.5)
+
+    print("\nPlaying 10 games (bet 50 each, odds 2x)\n")
+    for i in range(1, 11):
+        won, stake, result = calc.play(bet_amount=50.0, current_stake=stake, odds=2.0)
+        print(f"  Game {i:>2}  {result}  |  Balance: {stake:.2f}")
+        if stake < 50:
+            print("  Not enough stake to continue.")
+            break
+
+    print("\nRunning totals and statistics")
+    calc.print_stats()
+
+    print("\nBalance history")
+    calc.print_balance_history(initial_stake)
 
 
 if __name__ == "__main__":
