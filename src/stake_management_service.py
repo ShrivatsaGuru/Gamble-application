@@ -123,20 +123,17 @@ class StakeManagementService:
         if not rows:
             print("No transactions found."); return
 
-        print(f"\n{'='*55}")
-        print(f"  Stake History Report — Gambler ID {gambler_id}")
-        print(f"{'='*55}")
-        print(f"{'Type':<15} {'Amount':>8} {'Before':>9} {'After':>9}")
-        print(f"{'-'*55}")
+        print(f"\n  Stake History — Gambler ID {gambler_id}")
+        print(f"  {'Type':<15} {'Amount':>8} {'Before':>9} {'After':>9}")
+        print(f"  {'-'*45}")
         for r in rows:
-            print(f"{r['transaction_type']:<15} {float(r['amount']):>8.2f} {float(r['balance_before']):>9.2f} {float(r['balance_after']):>9.2f}")
+            print(f"  {r['transaction_type']:<15} {float(r['amount']):>8.2f} {float(r['balance_before']):>9.2f} {float(r['balance_after']):>9.2f}")
 
         # Summary
         wins  = sum(float(r["amount"]) for r in rows if r["transaction_type"] == TxType.BET_WIN)
         losses= sum(float(r["amount"]) for r in rows if r["transaction_type"] == TxType.BET_LOSS)
-        print(f"{'-'*55}")
-        print(f"Total Won: {wins:.2f} | Total Lost: {losses:.2f} | Net: {wins - losses:+.2f}")
-        print(f"{'='*55}\n")
+        print(f"  {'-'*45}")
+        print(f"  Total Won: {wins:.2f}  |  Total Lost: {losses:.2f}  |  Net: {wins - losses:+.2f}\n")
 
     # Deposit / Withdrawal helpers
     def deposit(self, gambler_id, amount):

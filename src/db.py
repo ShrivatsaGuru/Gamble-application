@@ -39,7 +39,20 @@ def init_db():
             FOREIGN KEY (gambler_id) REFERENCES gamblers(id)
         )
     """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS bets (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            gambler_id INT,
+            amount DECIMAL(10,2),
+            won BOOLEAN,
+            stake_before DECIMAL(10,2),
+            stake_after DECIMAL(10,2),
+            strategy VARCHAR(50),
+            placed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (gambler_id) REFERENCES gamblers(id)
+        )
+    """)
     conn.commit()
     cursor.close()
     conn.close()
-    print("Database initialized.")
+    print("Database ready.")
