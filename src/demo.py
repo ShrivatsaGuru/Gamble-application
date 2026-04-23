@@ -4,6 +4,7 @@ from stake_management_service import StakeManagementService
 from betting_service import BettingService, FixedAmountStrategy, PercentageStrategy, MartingaleStrategy
 from game_session_service import GameSessionService
 from win_loss_calculator import WinLossCalculator
+from input_validator import InputValidator
 
 
 def section(title):
@@ -135,6 +136,43 @@ def main():
 
     print("\nBalance history")
     calc.print_balance_history(initial_stake)
+
+
+    section("Use Case 6: Input Validation and Error Handling")
+
+    v = InputValidator()
+
+    print("\nValidate initial stake")
+    print("  stake=300    ", end=""); v.check(v.validate_initial_stake(300.0))
+    print("  stake=-50    ", end=""); v.check(v.validate_initial_stake(-50.0))
+    print("  stake=10     ", end=""); v.check(v.validate_initial_stake(10.0))
+
+    print("\nValidate bet amount (current stake = 200)")
+    print("  bet=50       ", end=""); v.check(v.validate_bet_amount(50.0, 200.0))
+    print("  bet=250      ", end=""); v.check(v.validate_bet_amount(250.0, 200.0))
+    print("  bet=0        ", end=""); v.check(v.validate_bet_amount(0.0, 200.0))
+
+    print("\nValidate win/loss limits (stake=200)")
+    print("  upper=400, lower=50  ", end=""); v.check(v.validate_limits(200.0, 400.0, 50.0))
+    print("  upper=100, lower=50  ", end=""); v.check(v.validate_limits(200.0, 100.0, 50.0))
+    print("  upper=400, lower=-10 ", end=""); v.check(v.validate_limits(200.0, 400.0, -10.0))
+
+    print("\nValidate probability")
+    print("  prob=0.6     ", end=""); v.check(v.validate_probability(0.6))
+    print("  prob=1.5     ", end=""); v.check(v.validate_probability(1.5))
+    print("  prob=-0.1    ", end=""); v.check(v.validate_probability(-0.1))
+
+    print("\nValidate non-negative stake")
+    print("  stake=0      ", end=""); v.check(v.validate_stake_non_negative(0.0))
+    print("  stake=-20    ", end=""); v.check(v.validate_stake_non_negative(-20.0))
+
+    print("\nParse numeric input")
+    for raw in ["  42.5 ", "abc", "", "inf"]:
+        try:
+            val = v.parse_number(raw)
+            print(f"  '{raw.strip()}' -> {val}")
+        except Exception as e:
+            print(f"  '{raw.strip()}' -> Error: {e}")
 
 
 if __name__ == "__main__":
