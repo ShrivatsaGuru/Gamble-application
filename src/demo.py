@@ -2,6 +2,7 @@ from db import init_db
 from gambler_profile_service import GamblerProfileService
 from stake_management_service import StakeManagementService
 from betting_service import BettingService, FixedAmountStrategy, PercentageStrategy, MartingaleStrategy
+from game_session_service import GameSessionService
 
 
 def section(title):
@@ -14,6 +15,7 @@ def main():
     profile_svc = GamblerProfileService()
     stake_svc   = StakeManagementService()
     bet_svc     = BettingService()
+    session_svc = GameSessionService()
 
 
     section("Use Case 1: Gambler Profile Management")
@@ -82,6 +84,35 @@ def main():
 
     print("\nBet history")
     bet_svc.get_bet_history(gid)
+
+
+    section("Use Case 4: Game Session Management")
+
+    print("\nStart a new session")
+    sid = session_svc.start(gid)
+
+    print("\nPlay 5 games (bet 30 each, 50% win chance)")
+    games, wins, losses, reason, final_stake = session_svc.play_games(
+        gid, sid, count=5, bet_amount=30.0, win_probability=0.5
+    )
+
+    print("\nPause the session")
+    session_svc.pause(sid)
+
+    print("\nResume the session")
+    session_svc.resume(sid)
+
+    print("\nPlay 3 more games")
+    g2, w2, l2, reason, final_stake = session_svc.play_games(
+        gid, sid, count=3, bet_amount=30.0, win_probability=0.5
+    )
+    games += g2; wins += w2; losses += l2
+
+    print("\nEnd the session")
+    session_svc.end(sid, games, wins, losses, reason)
+
+    print("\nSession summary")
+    session_svc.get_session_summary(sid)
 
 
 if __name__ == "__main__":

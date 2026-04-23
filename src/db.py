@@ -52,6 +52,19 @@ def init_db():
             FOREIGN KEY (gambler_id) REFERENCES gamblers(id)
         )
     """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS sessions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            gambler_id INT,
+            status VARCHAR(20),
+            games_played INT DEFAULT 0,
+            wins INT DEFAULT 0,
+            losses INT DEFAULT 0,
+            started_at DATETIME,
+            ended_at DATETIME,
+            FOREIGN KEY (gambler_id) REFERENCES gamblers(id)
+        )
+    """)
     conn.commit()
     cursor.close()
     conn.close()
