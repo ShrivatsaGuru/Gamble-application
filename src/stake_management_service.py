@@ -1,6 +1,5 @@
 from db import get_connection
 
-# Transaction types
 class TxType:
     INITIAL   = "INITIAL_STAKE"
     BET_WIN   = "BET_WIN"
@@ -9,10 +8,7 @@ class TxType:
     WITHDRAWAL= "WITHDRAWAL"
     RESET     = "RESET"
 
-
 class StakeManagementService:
-
-    # Helper: get current stake from DB
     def _get_stake(self, gambler_id):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -23,7 +19,6 @@ class StakeManagementService:
             raise ValueError(f"Gambler ID {gambler_id} not found.")
         return row
 
-    # Helper: record a transaction and update stake
     def _apply(self, gambler_id, tx_type, amount):
         row = self._get_stake(gambler_id)
         before = float(row["stake"])
@@ -43,7 +38,6 @@ class StakeManagementService:
         cursor.close(); conn.close()
         return before, after
 
-    # 1. Initialize stake (called on gambler creation)
     def initialize(self, gambler_id, stake):
         conn = get_connection()
         cursor = conn.cursor()
@@ -55,7 +49,6 @@ class StakeManagementService:
         cursor.close(); conn.close()
         print(f"Stake initialized: {stake}")
 
-    # 2. Track / view current stake
     def track(self, gambler_id):
         row = self._get_stake(gambler_id)
         stake = float(row["stake"])
@@ -69,7 +62,7 @@ class StakeManagementService:
         print(f"Current Stake: {stake:.2f} | Win: {win_t:.2f} | Loss: {loss_t:.2f}{warn}")
         return stake
 
-    # 3. Calculate stake after a bet outcome
+
     def calculate(self, gambler_id, bet_amount, won):
         tx_type = TxType.BET_WIN if won else TxType.BET_LOSS
         change = bet_amount if won else -bet_amount
@@ -78,7 +71,6 @@ class StakeManagementService:
         print(f"Bet {result}: {bet_amount:.2f} | Stake: {before:.2f} → {after:.2f}")
         return after
 
-    # 4. Monitor fluctuations (peak, low, volatility)
     def monitor(self, gambler_id):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -95,7 +87,7 @@ class StakeManagementService:
         print(f"Peak: {peak:.2f} | Low: {low:.2f} | Volatility: {volatility:.2f} | Transactions: {row['total_tx']}")
         return {"peak": peak, "low": low, "volatility": volatility}
 
-    # 5. Validate boundaries
+
     def validate_boundaries(self, gambler_id):
         row = self._get_stake(gambler_id)
         stake = float(row["stake"])
@@ -109,7 +101,7 @@ class StakeManagementService:
         print(f"Stake {stake:.2f} is within boundaries ({loss_t:.2f} - {win_t:.2f}).")
         return "OK"
 
-    # 6. Generate stake history report
+  
     def report(self, gambler_id):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -131,14 +123,14 @@ class StakeManagementService:
         for r in rows:
             print(f"{r['transaction_type']:<15} {float(r['amount']):>8.2f} {float(r['balance_before']):>9.2f} {float(r['balance_after']):>9.2f}")
 
-        # Summary
+      
         wins  = sum(float(r["amount"]) for r in rows if r["transaction_type"] == TxType.BET_WIN)
         losses= sum(float(r["amount"]) for r in rows if r["transaction_type"] == TxType.BET_LOSS)
         print(f"{'-'*55}")
         print(f"Total Won: {wins:.2f} | Total Lost: {losses:.2f} | Net: {wins - losses:+.2f}")
         print(f"{'='*55}\n")
 
-    # Deposit / Withdrawal helpers
+
     def deposit(self, gambler_id, amount):
         _, after = self._apply(gambler_id, TxType.DEPOSIT, amount)
         print(f"Deposited {amount:.2f}. New stake: {after:.2f}")
