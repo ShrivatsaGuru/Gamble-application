@@ -1,11 +1,8 @@
 from db import get_connection
 from gambler_profile import GamblerStatistics
-
 MIN_STAKE = 50.0
 
 class GamblerProfileService:
-
-    
     def create(self, name, email, stake, win_threshold, loss_threshold):
         if stake < MIN_STAKE:
             raise ValueError(f"Initial stake must be at least {MIN_STAKE}")
@@ -13,7 +10,6 @@ class GamblerProfileService:
             raise ValueError("Win threshold must be greater than initial stake")
         if loss_threshold >= stake:
             raise ValueError("Loss threshold must be less than initial stake")
-
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
@@ -26,8 +22,6 @@ class GamblerProfileService:
         conn.close()
         print(f"Gambler '{name}' created with ID {gambler_id}.")
         return gambler_id
-
-    
     def update(self, gambler_id, name=None, email=None, win_threshold=None, loss_threshold=None):
         fields, values = [], []
         if name:
@@ -50,8 +44,6 @@ class GamblerProfileService:
         conn.close()
         print(f"Gambler ID {gambler_id} updated. Here are the new details:")
         self.retrieve(gambler_id)
-
-   
     def retrieve(self, gambler_id):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -64,8 +56,6 @@ class GamblerProfileService:
         stats = GamblerStatistics(row)
         print(stats)
         return stats
-
-   
     def validate(self, gambler_id):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -81,12 +71,9 @@ class GamblerProfileService:
             print(f"Stake too low (min {MIN_STAKE})."); return False
         print("Gambler is eligible to play.")
         return True
-
- 
     def reset(self, gambler_id, new_stake):
         if new_stake < MIN_STAKE:
             raise ValueError(f"New stake must be at least {MIN_STAKE}")
-        
         win_threshold = new_stake * 2
         loss_threshold = new_stake * 0.5
         conn = get_connection()
