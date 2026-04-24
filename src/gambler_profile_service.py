@@ -1,11 +1,8 @@
 from db import get_connection
 from gambler_profile import GamblerStatistics
-
 MIN_STAKE = 50.0
 
 class GamblerProfileService:
-
-    # 1. Create new gambler
     def create(self, name, email, stake, win_threshold, loss_threshold):
         if stake < MIN_STAKE:
             raise ValueError(f"Initial stake must be at least {MIN_STAKE}")
@@ -13,7 +10,6 @@ class GamblerProfileService:
             raise ValueError("Win threshold must be greater than initial stake")
         if loss_threshold >= stake:
             raise ValueError("Loss threshold must be less than initial stake")
-
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
@@ -26,8 +22,6 @@ class GamblerProfileService:
         conn.close()
         print(f"Gambler '{name}' created with ID {gambler_id}.")
         return gambler_id
-
-    # 2. Update personal info or thresholds
     def update(self, gambler_id, name=None, email=None, win_threshold=None, loss_threshold=None):
         fields, values = [], []
         if name:
@@ -50,8 +44,6 @@ class GamblerProfileService:
         conn.close()
         print(f"Gambler ID {gambler_id} updated. Here are the new details:")
         self.retrieve(gambler_id)
-
-    # 3. Retrieve statistics
     def retrieve(self, gambler_id):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -64,8 +56,6 @@ class GamblerProfileService:
         stats = GamblerStatistics(row)
         print(stats)
         return stats
-
-    # 4. Validate eligibility
     def validate(self, gambler_id):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -82,11 +72,9 @@ class GamblerProfileService:
         print("Gambler is eligible to play.")
         return True
 
-    # 5. Reset profile for new session
     def reset(self, gambler_id, new_stake):
         if new_stake < MIN_STAKE:
             raise ValueError(f"New stake must be at least {MIN_STAKE}")
-        # Proportional thresholds: win = 2x stake, loss = 0.5x stake
         win_threshold = new_stake * 2
         loss_threshold = new_stake * 0.5
         conn = get_connection()
